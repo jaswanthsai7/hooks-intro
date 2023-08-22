@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useState } from "react";
+import "./IngredientForm.css";
+import Card from "../../ui/Card";
 
+const IngredientForm = React.memo((props) => {
+  const inputState = useState({
+    title: " ",
+    amount: " ",
+  });
 
-import './IngredientForm.css';
-import Card from '../../ui/Card';
-
-const IngredientForm = React.memo(props => {
-  const submitHandler = event => {
+  const submitHandler = (event) => {
     event.preventDefault();
+    console.log(inputState);
     // ...
   };
 
@@ -16,11 +20,32 @@ const IngredientForm = React.memo(props => {
         <form onSubmit={submitHandler}>
           <div className="form-control">
             <label htmlFor="title">Name</label>
-            <input type="text" id="title" />
+            <input
+              type="text"
+              id="title"
+              value={inputState[0].title}
+              onChange={(e) => {
+                const title = e.target.value;
+                inputState[1]((prevInputState) => ({
+                  title: title,
+                  amount: prevInputState.amount,
+                }));
+              }}
+            />
           </div>
           <div className="form-control">
             <label htmlFor="amount">Amount</label>
-            <input type="number" id="amount" />
+            <input
+              type="number"
+              id="amount"
+              value={inputState[1].amount}
+              onChange={(e) =>
+                inputState[1]((prevInputState) => ({
+                  title: prevInputState.title,
+                  amount: e.target.value,
+                }))
+              }
+            />
           </div>
           <div className="ingredient-form__actions">
             <button type="submit">Add Ingredient</button>
