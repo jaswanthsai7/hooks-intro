@@ -6,6 +6,8 @@ import IngredientList from "./IngredientList";
 import ErrorModal from "../../ui/ErrorModal";
 import LoadingIndicator from "../../ui/LoadingIndicator";
 
+import useHttp from "../../hooks/http";
+
 const loadReducer = (htttpState, action) => {
   switch (action.type) {
     case "SEND":
@@ -23,6 +25,7 @@ const loadReducer = (htttpState, action) => {
   }
 };
 function Ingredients() {
+  //  const {isLoading,error,data,sendRequest} =useHttp()
   const [userIngredients, setUserIngredients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -57,7 +60,7 @@ function Ingredients() {
     setIsLoading(false);
   }, []);
 
-  const addIngredientHandler = (ingredient) => {
+  const addIngredientHandler = useCallback((ingredient) => {
     // setIsLoading(true);
     dispatch({ type: "SEND" });
     try {
@@ -83,7 +86,7 @@ function Ingredients() {
     } catch (error) {
       setError("Something went wrong!");
     }
-  };
+  }, []);
 
   const removeIngredientHandler = (ingredientId) => {
     fetch(
