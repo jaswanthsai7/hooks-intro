@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import IngredientForm from "./IngredientForm";
 import Search from "./Search";
@@ -7,24 +7,28 @@ import IngredientList from "./IngredientList";
 function Ingredients() {
   const [userIngredients, setUserIngredients] = useState([]);
 
-  useEffect(() => {
-    fetch(
-      "https://react-hooks-f5f7c-default-rtdb.firebaseio.com/ingredients.json"
-    )
-      .then((response) => {
-        return response.json();
-      })
-      .then((responseData) => {
-        const loadUserIngredients = [];
-        for (const key in responseData) {
-          loadUserIngredients.push({
-            id: key,
-            title: responseData[key].title,
-            amount: responseData[key].amount,
-          });
-        }
-        setUserIngredients(loadUserIngredients);
-      });
+  // useEffect(() => {
+  //   fetch(
+  //     "https://react-hooks-f5f7c-default-rtdb.firebaseio.com/ingredients.json"
+  //   )
+  //     .then((response) => {
+  //       return response.json();
+  //     })
+  //     .then((responseData) => {
+  //       const loadUserIngredients = [];
+  //       for (const key in responseData) {
+  //         loadUserIngredients.push({
+  //           id: key,
+  //           title: responseData[key].title,
+  //           amount: responseData[key].amount,
+  //         });
+  //       }
+  //       setUserIngredients(loadUserIngredients);
+  //     });
+  // }, []);
+
+  const filterHandler = useCallback((filteredIngredients) => {
+    setUserIngredients(filteredIngredients);
   }, []);
 
   const addIngredientHandler = (ingredient) => {
@@ -51,9 +55,16 @@ function Ingredients() {
     }
   };
   const removeIngredientHandler = (ingredientId) => {
-    setUserIngredients((prevIngredients) =>
-      prevIngredients.filter((ingredient) => ingredient.id !== ingredientId)
-    );
+    fetch(
+      `https://react-hooks-f5f7c-default-rtdb.firebaseio.com/ingredients/${ingredientId}.json`,
+      {
+        method: "DELETE",
+      }
+    ).then((response) => {
+      setUserIngredients((prevIngredients) =>
+        prevIngredients.filter((ingredient) => ingredient.id !== ingredientId)
+      );
+    });
   };
 
   return (
@@ -61,7 +72,7 @@ function Ingredients() {
       <IngredientForm addIngredientHandler={addIngredientHandler} />
 
       <section>
-        <Search />
+        <Search onLoadIngredients={filterHandler} />
         {/* Need to add list here! */}
         <IngredientList
           ingredients={userIngredients}
